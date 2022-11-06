@@ -149,12 +149,12 @@ Window
         }
     }
 
-    Rectangle  // 动画变化
+    Rectangle  // 方法1:动画变化
     {
         id:flashLoad
         x: 400
         y:400
-//        text:"动画变化"
+        //        text:"动画变化"
         width: 75
         height: 75
         color: "blue"
@@ -199,5 +199,178 @@ Window
         }
     }
 
+    Rectangle   // 方法2:利用PropertyAnimation 进行动画
+    {
+        id:flashLoad2
+        width: 100
+        height: 100
+        anchors.left: flashLoad.right
+        anchors.leftMargin: 10
+        color: "red"
+
+        PropertyAnimation on y
+        {
+            to : 100
+            duration:1000
+        }
+
+        PropertyAnimation on width
+        {
+            to:200
+            duration:1000
+        }
+        //        ColorAnimation on color
+        //        {
+        //            to:"yellow"
+        //            duration:1000
+        //        }
+        SequentialAnimation on color //按照队列来改变颜色
+        {
+            ColorAnimation
+            {
+                to:"yellow"
+                duration:1000
+            }
+            ColorAnimation
+            {
+                to:"red"
+                duration:1000
+            }
+        }
+    }
+
+    Rectangle   // 方法3:利用state和transitions，通过state来显示动画
+    {
+        id:button
+        width: 75
+        height: 75
+        state:"release"
+        anchors.bottom: parent.bottom
+
+        MouseArea
+        {
+            anchors.fill:parent
+            onPressed:
+            {
+                button.state = "press"
+            }
+
+            onReleased:
+            {
+                button.state = "release"
+            }
+        }
+
+
+        states: [
+            State {
+                name: "press"
+                PropertyChanges {
+                    target: button
+                    color: "lightblue"
+                }
+            },
+            State {
+                name: "release"
+                PropertyChanges {
+                    target: button
+                    color: "blue"
+                }
+            }
+        ]
+
+        transitions:[
+            Transition {
+                from: "press"
+                to: "release"
+
+                ColorAnimation {
+                    //                    from: "white"
+                    //                    to: "black"
+                    duration: 2000
+                }
+            },
+
+            Transition {
+                from: "release"
+                to: "press"
+
+                ColorAnimation {
+                    //                    from: "white"
+                    //                    to: "black"
+                    duration: 2000
+                }
+            }
+        ]
+
+    }
+
+    Rectangle
+    {
+        x:100
+        id:banner
+        width: 150
+        height: 100
+        border.color: "black"
+
+        Column
+        {
+            anchors.centerIn: parent
+            Text {
+                id: code
+                text: qsTr("Code les")
+                opacity: 0.1
+            }
+            Text {
+                id: creat
+                text: qsTr("Cread more")
+                opacity: 0.1
+            }
+            Text {
+                id: deploy
+                text: qsTr("Deloy everywhere")
+                opacity: 0.1
+            }
+
+
+        }
+        MouseArea
+        {
+            anchors.fill: parent  //可点击区域要写
+            onPressed:
+            {
+//                console.log("tes");
+                playBanner.start()
+            }
+        }
+        SequentialAnimation
+        {
+            id:playBanner
+            running: false
+
+            NumberAnimation {
+                target: code
+                property: "opacity"
+                to:1.0
+                duration: 200
+                easing.type: Easing.InOutQuad
+            }
+
+            NumberAnimation {
+                target: creat
+                property: "opacity"
+                to:1.0
+                duration: 200
+                easing.type: Easing.InOutQuad
+            }
+            NumberAnimation {
+                target: deploy
+                property: "opacity"
+                to:1.0
+                duration: 200
+                easing.type: Easing.InOutQuad
+            }
+        }
+    }
 
 }
